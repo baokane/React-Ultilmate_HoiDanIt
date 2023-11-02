@@ -18,10 +18,10 @@ const Header = () => {
                         <NavLink to="/" className="nav-link">
                             Home
                         </NavLink>
-                        <NavLink to="/users" className="nav-link">
+                        <NavLink to="users" className="nav-link">
                             Users
                         </NavLink>
-                        <NavLink to="/admins" className="nav-link">
+                        <NavLink to="admins" className="nav-link">
                             Admin
                         </NavLink>
                         {/* <Nav.Link href="/">Home</Nav.Link>
