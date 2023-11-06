@@ -2,16 +2,25 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FcPlus } from 'react-icons/fc';
-import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import { postCreateNewUser } from '../../../services/apiService';
 
 const ModalCreateUser = (props) => {
     const { show, setShow } = props;
 
     // const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setShow(false);
+        setEmail('');
+        setPasswrod('');
+        setUsername('');
+        setRole('USER');
+        setImage('');
+        setPreviewImage('');
+    };
     // const handleClose = () => props.setShow(false);
-    const handleShow = () => setShow(true);
+    // const handleShow = () => setShow(true);
 
     const [email, setEmail] = useState('');
     const [password, setPasswrod] = useState('');
@@ -29,30 +38,52 @@ const ModalCreateUser = (props) => {
         }
     };
 
-    const handleSubMitCreateUser = async () => {
-        // let data = {
-        //     email: email,
-        //     password: password,
-        //     usename: username,
-        //     role: role,
-        //     userImage: image,
-        // };
-        const data = new FormData();
-        data.append('email', email);
-        data.append('password', password);
-        data.append('usename', username);
-        data.append('role', role);
-        data.append('userImage', image);
+    const validateEmail = (email) => {
+        return String(email)
+            .toLowerCase()
+            .match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            );
+    };
 
-        let res = await axios.post('http://localhost:8081/api/v1/participant', data);
-        console.log(res);
+    const handleSubMitCreateUser = async () => {
+        // Validate
+        const isValidEmail = validateEmail(email);
+        if (!isValidEmail) {
+            toast.error('invalid email');
+            return;
+        }
+
+        if (!password) {
+            toast.error('invalid password');
+            return;
+        }
+
+        // Submit data
+        // const data = new FormData();
+        // data.append('email', email);
+        // data.append('password', password);
+        // data.append('usename', username);
+        // data.append('role', role);
+        // data.append('userImage', image);
+
+        let data = await postCreateNewUser(email, password, username, role, image);
+
+        if (data && data.EC === 0) {
+            handleClose();
+            toast.success(data.EM);
+        }
+
+        if (data && data.EC !== 0) {
+            toast.error(data.EM);
+        }
     };
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
+            {/* <Button variant="primary" onClick={handleShow}>
                 Launch demo modal
-            </Button>
+            </Button> */}
 
             <Modal
                 show={show}
@@ -123,6 +154,19 @@ const ModalCreateUser = (props) => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </>
     );
 };
