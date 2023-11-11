@@ -1,26 +1,12 @@
-import { useEffect, useState } from 'react';
-import { getAllUsers } from '../../../services/apiService';
-
 const TableUser = (props) => {
-    const [listUsers, setListUsers] = useState([]);
-
-    useEffect(() => {
-        fetchLIstUser();
-    }, []);
-
-    const fetchLIstUser = async () => {
-        let res = await getAllUsers();
-        if (res.EC === 0) {
-            setListUsers(res.DT);
-        }
-    };
+    const { listUsers, handleClickBtnUpdate, handleClickBtnDelete } = props;
 
     return (
         <>
             <table className="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">No</th>
+                        <th scope="col">ID</th>
                         <th scope="col">Username</th>
                         <th scope="col">Email</th>
                         <th scope="col">Role</th>
@@ -32,14 +18,26 @@ const TableUser = (props) => {
                         listUsers.map((item, index) => {
                             return (
                                 <tr key={`table-users-${index}`}>
-                                    <th scope="row">{index + 1}</th>
+                                    <td>{item.id}</td>
                                     <td>{item.username}</td>
                                     <td>{item.email}</td>
                                     <td>{item.role}</td>
                                     <td>
-                                        <button className="btn btn-secondary">View</button>
-                                        <button className="btn btn-warning mx-3">Update</button>
-                                        <button className="btn btn-danger">Delete</button>
+                                        <button
+                                            className="btn btn-secondary"
+                                            onClick={() => props.handleClickBtnView(item)}
+                                        >
+                                            View
+                                        </button>
+                                        <button
+                                            className="btn btn-warning mx-3"
+                                            onClick={() => handleClickBtnUpdate(item)}
+                                        >
+                                            Update
+                                        </button>
+                                        <button className="btn btn-danger" onClick={() => handleClickBtnDelete(item)}>
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             );

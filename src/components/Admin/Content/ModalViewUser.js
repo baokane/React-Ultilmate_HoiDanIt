@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FcPlus } from 'react-icons/fc';
-import { ToastContainer, toast } from 'react-toastify';
-import { postCreateNewUser } from '../../../services/apiService';
+import _ from 'lodash';
 
-const ModalCreateUser = (props) => {
-    const { show, setShow } = props;
+const ModalUpdateUser = (props) => {
+    const { show, setShow, dataView, resetViewData } = props;
 
     // const [show, setShow] = useState(false);
 
@@ -18,6 +17,7 @@ const ModalCreateUser = (props) => {
         setRole('USER');
         setImage('');
         setPreviewImage('');
+        resetViewData('');
     };
     // const handleClose = () => props.setShow(false);
     // const handleShow = () => setShow(true);
@@ -29,56 +29,17 @@ const ModalCreateUser = (props) => {
     const [image, setImage] = useState('');
     const [previewImage, setPreviewImage] = useState('');
 
-    const handleUploadImage = (e) => {
-        if (e.target && e.target.files && e.target.files[0]) {
-            setPreviewImage(URL.createObjectURL(e.target.files[0]));
-            setImage(e.target.files[0]);
-        } else {
-            // setPreviewImage('');
+    useEffect(() => {
+        if (!_.isEmpty(dataView)) {
+            setEmail(dataView.email);
+            setUsername(dataView.username);
+            setRole(dataView.role);
+            setImage('');
+            if (dataView.image) {
+                setPreviewImage(`data:image/jpeg;base64,${dataView.image}`);
+            }
         }
-    };
-
-    const validateEmail = (email) => {
-        return String(email)
-            .toLowerCase()
-            .match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            );
-    };
-
-    const handleSubMitCreateUser = async () => {
-        // Validate
-        const isValidEmail = validateEmail(email);
-        if (!isValidEmail) {
-            toast.error('invalid email');
-            return;
-        }
-
-        if (!password) {
-            toast.error('invalid password');
-            return;
-        }
-
-        // Submit data
-        // const data = new FormData();
-        // data.append('email', email);
-        // data.append('password', password);
-        // data.append('usename', username);
-        // data.append('role', role);
-        // data.append('userImage', image);
-
-        let data = await postCreateNewUser(email, password, username, role, image);
-
-        if (data && data.EC === 0) {
-            handleClose();
-            toast.success(data.EM);
-            await props.fetchListUser();
-        }
-
-        if (data && data.EC !== 0) {
-            toast.error(data.EM);
-        }
-    };
+    }, [dataView]);
 
     return (
         <>
@@ -95,7 +56,7 @@ const ModalCreateUser = (props) => {
                 className="modal-add-user"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Add new user</Modal.Title>
+                    <Modal.Title>Update a user</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <form className="row g-3">
@@ -105,6 +66,7 @@ const ModalCreateUser = (props) => {
                                 type="email"
                                 className="form-control"
                                 value={email}
+                                disabled
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
@@ -114,6 +76,7 @@ const ModalCreateUser = (props) => {
                                 type="password"
                                 className="form-control"
                                 value={password}
+                                disabled
                                 onChange={(e) => setPasswrod(e.target.value)}
                             />
                         </div>
@@ -139,10 +102,10 @@ const ModalCreateUser = (props) => {
                                 <FcPlus />
                                 Upload File Image
                             </label>
-                            <input type="file" hidden id="label-upload" onChange={handleUploadImage} />
+                            <input type="file" hidden id="label-upload" />
                         </div>
                         <div className="col-md-12 img-priview">
-                            {previewImage ? <img src={previewImage} alt="anh" /> : <span>Preview Image</span>}
+                            {previewImage ? <img src={previewImage} alt="anh" /> : <span>No Preview Image</span>}
                         </div>
                     </form>
                 </Modal.Body>
@@ -150,13 +113,10 @@ const ModalCreateUser = (props) => {
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={() => handleSubMitCreateUser()}>
-                        Save Changes
-                    </Button>
                 </Modal.Footer>
             </Modal>
         </>
     );
 };
 
-export default ModalCreateUser;
+export default ModalUpdateUser;

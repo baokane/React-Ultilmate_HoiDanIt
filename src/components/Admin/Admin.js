@@ -23,8 +23,8 @@ const Admin = (props) => {
                 </div>
             </div>
 
-            {/* <ToastContainer
-                position="bottom-center"
+            <ToastContainer
+                position="top-right"
                 autoClose={5000}
                 hideProgressBar={false}
                 newestOnTop={false}
@@ -34,7 +34,7 @@ const Admin = (props) => {
                 draggable
                 pauseOnHover
                 theme="light"
-            /> */}
+            />
         </div>
     );
 };
