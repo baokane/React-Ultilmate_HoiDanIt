@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react';
 const TableUserPaginate = (props) => {
     // const [pageCount, setPageCount] = useState(0);
 
-    const { listUsers, handleClickBtnUpdate, handleClickBtnDelete, fetchListUserWithPaginate, pageCount } = props;
+    const {
+        listUsers,
+        handleClickBtnUpdate,
+        handleClickBtnDelete,
+        handleClickBtnView,
+        fetchListUserWithPaginate,
+        pageCount,
+    } = props;
 
     const handlePageClick = (event) => {
         fetchListUserWithPaginate(+event.selected + 1);
@@ -55,7 +62,7 @@ const TableUserPaginate = (props) => {
                         })}
                     {listUsers && listUsers.length === 0 && (
                         <tr>
-                            <td colSpan={'4'}>Not found data</td>
+                            <td colSpan={'5'}>Not found data</td>
                         </tr>
                     )}
                 </tbody>
