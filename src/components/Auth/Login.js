@@ -3,12 +3,19 @@ import './Login.scss';
 import { useNavigate } from 'react-router-dom';
 import { postLogin } from '../../services/apiService';
 import { ToastContainer, toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { doLogin } from '../../redux/action/userAction';
+import { ImSpinner10 } from 'react-icons/im';
 
 const Login = (props) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const navigate = useNavigate();
+
+    const dispatch = useDispatch();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const validateEmail = (email) => {
         return String(email)
@@ -31,16 +38,21 @@ const Login = (props) => {
             return;
         }
 
+        setIsLoading(true);
+
         // Submit api
         let data = await postLogin(email, password);
         if (data && data.EC === 0) {
+            dispatch(doLogin(data));
             toast.success(data.EM);
             // await props.fetchListUser();
             navigate('/');
+            setIsLoading(false);
         }
 
         if (data && data.EC !== 0) {
             toast.error(data.EM);
+            setIsLoading(false);
         }
     };
 
@@ -48,7 +60,7 @@ const Login = (props) => {
         <div className="login-container">
             <div className="Header">
                 <span>Don't have an account yet?</span>
-                <button onClick={() => navigate('register')}>Sign up</button>
+                <button onClick={() => navigate('/register')}>Sign up</button>
             </div>
             <div className="title col-4 mx-auto">Typeform</div>
             <div className="welcome col-4 mx-auto">Hello, who's this?</div>
@@ -73,8 +85,9 @@ const Login = (props) => {
                 </div>
                 <span className="forgot-password">Forgot password?</span>
                 <div>
-                    <button className="btn-submit" onClick={handleLogin}>
-                        Log in to Typeform
+                    <button className="btn-submit" onClick={handleLogin} disabled={isLoading}>
+                        {isLoading === true && <ImSpinner10 className="loader-icon" />}
+                        <span>Log in to Typeform</span>
                     </button>
                 </div>
                 <div className="text-center">
