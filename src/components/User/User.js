@@ -1,5 +1,5 @@
 const User = (prop) => {
-    return <div>User component</div>;
+    return <h1>User content</h1>;
 };
 
 export default User;
