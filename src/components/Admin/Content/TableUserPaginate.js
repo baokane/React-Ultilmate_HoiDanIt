@@ -35,7 +35,7 @@ const TableUserPaginate = (props) => {
                         listUsers.length > 0 &&
                         listUsers.map((item, index) => {
                             return (
-                                <tr key={`table-users-${index}`}>
+                                <tr key={`table-users-${index}-with-paginate`}>
                                     <td>{item.id}</td>
                                     <td>{item.username}</td>
                                     <td>{item.email}</td>

@@ -25,12 +25,17 @@ const ListQuiz = (prop) => {
                 arrQuiz.length > 0 &&
                 arrQuiz.map((quiz, index) => {
                     return (
-                        <div key={`index-${quiz}`} className="card" style={{ width: '18rem' }}>
+                        <div key={`index-${quiz.id}`} className="card" style={{ width: '18rem' }}>
                             <img src={`data:image/png;base64, ${quiz.image}`} className="card-img-top" alt="..." />
                             <div className="card-body">
                                 <h5 className="card-title">Quiz {index + 1}</h5>
                                 <p className="card-text">{quiz.description}</p>
-                                <button className="btn btn-primary" onClick={() => navigate(`/quiz/${quiz.id}`)}>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() =>
+                                        navigate(`/quiz/${quiz.id}`, { state: { quizTilte: quiz.description } })
+                                    }
+                                >
                                     Start Now
                                 </button>
                             </div>
