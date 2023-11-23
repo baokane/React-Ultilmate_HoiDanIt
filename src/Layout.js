@@ -13,7 +13,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const NotFound = () => {
-    return <div class="alert alert-danger container mt-3">Not Found Data With Your Current URL</div>;
+    return <div className="alert alert-danger container mt-3">Not Found Data With Your Current URL</div>;
 };
 
 const Layout = (props) => {
