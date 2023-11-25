@@ -39,6 +39,9 @@ const DetailQuiz = (props) => {
                             questionDescription = item.description;
                             image = item.image;
                         }
+
+                        // tạo mới key:value -> isSelected:false vào mỗi answers
+                        item.answers.isSelected = false;
                         answers.push(item.answers);
                         // console.log('item :', item);
                     });
@@ -47,12 +50,12 @@ const DetailQuiz = (props) => {
                     return { questionId: key, answers, questionDescription, image };
                 })
                 .value();
-            // console.log(data);
+            // console.log('data quiz: ', data);
             setDataQuiz(data);
         }
     };
 
-    console.log('dq', dataQuiz);
+    // console.log('dataQuiz:', dataQuiz);
 
     const handlePrev = () => {
         if (index - 1 < 0) return;
@@ -65,7 +68,97 @@ const DetailQuiz = (props) => {
         }
     };
 
+    const handleCheckbox = (answerId, questionId) => {
+        // console.log('q ID', questionId);
+
+        let dataQuizClone = _.cloneDeep(dataQuiz);
+        let question = dataQuizClone.find((item) => {
+            // console.log('item :', item);
+            return +item.questionId === +questionId;
+        });
+        console.log('item của qs:', question);
+        if (question && question.answers) {
+            // console.log('q', question);
+            let b = question.answers.map((item) => {
+                if (+item.id === +answerId) {
+                    item.isSelected = !item.isSelected;
+                    console.log('item: ', item.id, 'answer ID:', answerId, 'item.isSelected:', item.isSelected);
+                }
+                // console.log('item: ', item, 'answer ID:', answerId);
+                return item;
+            });
+            console.log('b:', b, 'question.answerd:', question.answers);
+            question.answers = b; // đang thử ko dùng
+        }
+
+        // setDataQuiz(dataQuizClone);
+
+        let index = dataQuizClone.findIndex((item) => +item.questionId === +questionId);
+        if (index > -1) {
+            dataQuizClone[index] = question;
+            console.log(
+                'dataQuizClone[index]:',
+                dataQuizClone[index],
+                'question:',
+                question,
+                'dataQuizClone:',
+                dataQuizClone,
+                'index:',
+                index,
+            );
+            setDataQuiz(dataQuizClone);
+        }
+
+        // console.log('data quiz...: ', dataQuizClone);
+    };
+
     // console.log('index + 1', index + 1);
+    // console.log('dataQuiz[index]', dataQuiz[index]);
+
+    const handleFinishQuiz = () => {
+        // {
+        //     "quizId": 1,
+        //     "answers": [
+        //         {
+        //             "questionId": 1,
+        //             "userAnswerId": [3]
+        //         },
+        //         {
+        //             "questionId": 2,
+        //             "userAnswerId": [6]
+        //         }
+        //     ]
+        // }
+        console.log('data quiz: ', dataQuiz);
+        let payLoad = {
+            quizId: +quizId,
+            answers: [],
+        };
+        let answers = [];
+        if (dataQuiz && dataQuiz.length > 0) {
+            dataQuiz.forEach((question) => {
+                let questionId = question.questionId;
+                let userAnswerId = [];
+
+                console.log('question:', question);
+
+                // todo : userAnswerId
+                question.answers.forEach((a) => {
+                    if (a.isSelected === true) {
+                        userAnswerId.push(a.id);
+                    }
+                    console.log('a:', a);
+                });
+                answers.push({
+                    questionId: +questionId,
+                    userAnswerId: userAnswerId,
+                });
+            });
+
+            payLoad.answers = answers;
+            console.log('final payload:', payLoad);
+        }
+    };
 
     return (
         <div className="detail-quiz-container">
@@ -78,7 +171,11 @@ const DetailQuiz = (props) => {
                     <img />
                 </div>
                 <div className="q-content">
-                    <Question index={index} data={dataQuiz && dataQuiz.length > 0 ? dataQuiz[index] : []} />
+                    <Question
+                        index={index}
+                        handleCheckbox={handleCheckbox}
+                        data={dataQuiz && dataQuiz.length > 0 ? dataQuiz[index] : []}
+                    />
                 </div>
                 <div className="footer">
                     <button className="btn btn-secondary" onClick={() => handlePrev()}>
@@ -86,6 +183,9 @@ const DetailQuiz = (props) => {
                     </button>
                     <button className="btn btn-primary" onClick={() => handleNext()}>
                         Next
+                    </button>
+                    <button className="btn btn-warning" onClick={() => handleFinishQuiz()}>
+                        Finish
                     </button>
                 </div>
             </div>

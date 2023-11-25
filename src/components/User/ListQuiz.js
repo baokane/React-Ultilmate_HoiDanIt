@@ -19,6 +19,7 @@ const ListQuiz = (prop) => {
         }
     };
 
+    console.log('arr quiz, ', arrQuiz);
     return (
         <div className="list-quiz-container container">
             {arrQuiz &&
