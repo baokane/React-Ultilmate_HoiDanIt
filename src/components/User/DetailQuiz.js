@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { getDataQuiz } from '../../services/apiService';
+import { getDataQuiz, postSubmitQuiz } from '../../services/apiService';
 import _ from 'lodash';
 import './DetailQuiz.scss';
 import Question from './Question';
+import ModalResult from './ModalResult';
 
 const DetailQuiz = (props) => {
     const params = useParams();
@@ -16,6 +17,10 @@ const DetailQuiz = (props) => {
     const [dataQuiz, setDataQuiz] = useState([]);
 
     const [index, setIndex] = useState(0);
+
+    const [isShowModalResult, setIsShowModalResult] = useState(false);
+
+    const [dataModalResult, setDataModalResult] = useState({});
 
     useEffect(() => {
         fetchQuestions();
@@ -58,15 +63,17 @@ const DetailQuiz = (props) => {
     // console.log('dataQuiz:', dataQuiz);
 
     const handlePrev = () => {
-        if (index - 1 < 0) return;
+        if (index <= 0) return;
         setIndex(index - 1);
     };
 
     const handleNext = () => {
-        if (dataQuiz && dataQuiz.length > index + 1) {
+        if (dataQuiz && dataQuiz.length >= index + 2) {
             setIndex(index + 1);
         }
     };
+
+    // i0 c1 ->i1 c2 ->i2 c3 loại
 
     const handleCheckbox = (answerId, questionId) => {
         // console.log('q ID', questionId);
@@ -87,27 +94,27 @@ const DetailQuiz = (props) => {
                 // console.log('item: ', item, 'answer ID:', answerId);
                 return item;
             });
-            console.log('b:', b, 'question.answerd:', question.answers);
-            question.answers = b; // đang thử ko dùng
+            console.log('b:', b, 'question.answerd = b:', (question.answers = b));
+            // question.answers = b; // đang thử ko dùng
         }
 
-        // setDataQuiz(dataQuizClone);
+        setDataQuiz(dataQuizClone);
 
-        let index = dataQuizClone.findIndex((item) => +item.questionId === +questionId);
-        if (index > -1) {
-            dataQuizClone[index] = question;
-            console.log(
-                'dataQuizClone[index]:',
-                dataQuizClone[index],
-                'question:',
-                question,
-                'dataQuizClone:',
-                dataQuizClone,
-                'index:',
-                index,
-            );
-            setDataQuiz(dataQuizClone);
-        }
+        // let index = dataQuizClone.findIndex((item) => +item.questionId === +questionId);
+        // if (index > -1) {
+        //     dataQuizClone[index] = question;
+        //     console.log(
+        //         'dataQuizClone[index]:',
+        //         dataQuizClone[index],
+        //         'question:',
+        //         question,
+        //         'dataQuizClone:',
+        //         dataQuizClone,
+        //         'index:',
+        //         index,
+        //     );
+        //     setDataQuiz(dataQuizClone);
+        // }
 
         // console.log('data quiz...: ', dataQuizClone);
     };
@@ -115,7 +122,7 @@ const DetailQuiz = (props) => {
     // console.log('index + 1', index + 1);
     // console.log('dataQuiz[index]', dataQuiz[index]);
 
-    const handleFinishQuiz = () => {
+    const handleFinishQuiz = async () => {
         // {
         //     "quizId": 1,
         //     "answers": [
@@ -129,7 +136,7 @@ const DetailQuiz = (props) => {
         //         }
         //     ]
         // }
-        console.log('data quiz: ', dataQuiz);
+        console.log('>>>data quiz: ', dataQuiz);
         let payLoad = {
             quizId: +quizId,
             answers: [],
@@ -157,8 +164,21 @@ const DetailQuiz = (props) => {
 
             payLoad.answers = answers;
             console.log('final payload:', payLoad);
+            // submit Api
+            let res = await postSubmitQuiz(payLoad);
+            console.log('check res:', res);
+            if (res && res.EC === 0) {
+                setDataModalResult({
+                    countCorrect: res.DT.countCorrect,
+                    countTotal: res.DT.countTotal,
+                    quizData: res.DT.quizData,
+                });
+                setIsShowModalResult(true);
+            } else alert('wrong');
         }
     };
+
+    console.log('data quiz', dataQuiz);
 
     return (
         <div className="detail-quiz-container">
@@ -190,6 +210,7 @@ const DetailQuiz = (props) => {
                 </div>
             </div>
             <div className="right-content">Count Down</div>
+            <ModalResult show={isShowModalResult} setShow={setIsShowModalResult} dataModalResult={dataModalResult} />
         </div>
     );
 };
