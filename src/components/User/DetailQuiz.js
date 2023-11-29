@@ -50,12 +50,12 @@ const DetailQuiz = (props) => {
                         answers.push(item.answers);
                         // console.log('item :', item);
                     });
-                    // console.log('value ', value, 'key ', key);
+                    console.log('value ', value, 'key ', key);
 
                     return { questionId: key, answers, questionDescription, image };
                 })
                 .value();
-            // console.log('data quiz: ', data);
+            console.log('data quiz: ', data);
             setDataQuiz(data);
         }
     };
@@ -76,28 +76,29 @@ const DetailQuiz = (props) => {
     // i0 c1 ->i1 c2 ->i2 c3 loại
 
     const handleCheckbox = (answerId, questionId) => {
-        // console.log('q ID', questionId);
+        console.log('qID:', questionId, 'aID:', answerId);
 
         let dataQuizClone = _.cloneDeep(dataQuiz);
         let question = dataQuizClone.find((item) => {
             // console.log('item :', item);
             return +item.questionId === +questionId;
         });
-        console.log('item của qs:', question);
+        console.log('question:', question);
         if (question && question.answers) {
-            // console.log('q', question);
+            // console.log('q', question, 'q.a:', question.answers);
             let b = question.answers.map((item) => {
+                console.log('item chinh:', item);
                 if (+item.id === +answerId) {
                     item.isSelected = !item.isSelected;
-                    console.log('item: ', item.id, 'answer ID:', answerId, 'item.isSelected:', item.isSelected);
+                    // console.log('item: ', item.id, 'answer ID:', answerId, 'item.isSelected:', item.isSelected);
                 }
                 // console.log('item: ', item, 'answer ID:', answerId);
                 return item;
             });
-            console.log('b:', b, 'question.answerd = b:', (question.answers = b));
+            // console.log('b:', b, 'question.answerd = b:', (question.answers = b));
             // question.answers = b; // đang thử ko dùng
         }
-
+        console.log('dataQuizClone: ', dataQuizClone);
         setDataQuiz(dataQuizClone);
 
         // let index = dataQuizClone.findIndex((item) => +item.questionId === +questionId);

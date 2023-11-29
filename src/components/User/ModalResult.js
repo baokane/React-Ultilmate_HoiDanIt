@@ -8,7 +8,7 @@ const ModalResult = (props) => {
     const handleClose = () => setShow(false);
     // const handleShow = () => setShow(true);
 
-    console.log('>>> check data:', dataModalResult);
+    // console.log('>>> check data:', dataModalResult);
 
     return (
         <>
