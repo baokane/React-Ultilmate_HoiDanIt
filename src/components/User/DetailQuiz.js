@@ -48,14 +48,12 @@ const DetailQuiz = (props) => {
                         // tạo mới key:value -> isSelected:false vào mỗi answers
                         item.answers.isSelected = false;
                         answers.push(item.answers);
-                        // console.log('item :', item);
                     });
-                    console.log('value ', value, 'key ', key);
 
                     return { questionId: key, answers, questionDescription, image };
                 })
                 .value();
-            console.log('data quiz: ', data);
+            // console.log('data quiz: ', data);
             setDataQuiz(data);
         }
     };
@@ -76,26 +74,19 @@ const DetailQuiz = (props) => {
     // i0 c1 ->i1 c2 ->i2 c3 loại
 
     const handleCheckbox = (answerId, questionId) => {
-        console.log('qID:', questionId, 'aID:', answerId);
+        // console.log('qID:', questionId, 'aID:', answerId);
 
         let dataQuizClone = _.cloneDeep(dataQuiz);
         let question = dataQuizClone.find((item) => {
-            // console.log('item :', item);
             return +item.questionId === +questionId;
         });
-        console.log('question:', question);
         if (question && question.answers) {
-            // console.log('q', question, 'q.a:', question.answers);
             let b = question.answers.map((item) => {
-                console.log('item chinh:', item);
                 if (+item.id === +answerId) {
                     item.isSelected = !item.isSelected;
-                    // console.log('item: ', item.id, 'answer ID:', answerId, 'item.isSelected:', item.isSelected);
                 }
-                // console.log('item: ', item, 'answer ID:', answerId);
                 return item;
             });
-            // console.log('b:', b, 'question.answerd = b:', (question.answers = b));
             // question.answers = b; // đang thử ko dùng
         }
         console.log('dataQuizClone: ', dataQuizClone);
@@ -148,14 +139,14 @@ const DetailQuiz = (props) => {
                 let questionId = question.questionId;
                 let userAnswerId = [];
 
-                console.log('question:', question);
+                // console.log('question:', question);
 
                 // todo : userAnswerId
                 question.answers.forEach((a) => {
                     if (a.isSelected === true) {
                         userAnswerId.push(a.id);
                     }
-                    console.log('a:', a);
+                    // console.log('a:', a);
                 });
                 answers.push({
                     questionId: +questionId,
@@ -164,10 +155,10 @@ const DetailQuiz = (props) => {
             });
 
             payLoad.answers = answers;
-            console.log('final payload:', payLoad);
+            // console.log('final payload:', payLoad);
             // submit Api
             let res = await postSubmitQuiz(payLoad);
-            console.log('check res:', res);
+            // console.log('check res:', res);
             if (res && res.EC === 0) {
                 setDataModalResult({
                     countCorrect: res.DT.countCorrect,
@@ -180,7 +171,6 @@ const DetailQuiz = (props) => {
     };
 
     console.log('data quiz', dataQuiz);
-
     return (
         <div className="detail-quiz-container">
             <div className="left-content">
