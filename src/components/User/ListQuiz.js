@@ -14,12 +14,13 @@ const ListQuiz = (prop) => {
 
     const getQuizData = async () => {
         const res = await getQuizByUser();
+        console.log('>>> list Quiz:', res);
         if (res && res.EC === 0) {
             setArrQuiz(res.DT);
         }
     };
 
-    // console.log('arr quiz, ', arrQuiz);
+    console.log('arr quiz, ', arrQuiz);
     return (
         <div className="list-quiz-container container">
             {arrQuiz &&

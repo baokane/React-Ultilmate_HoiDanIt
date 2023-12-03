@@ -87,7 +87,6 @@ const ModalUpdateUser = (props) => {
             handleClose();
             toast.success(data.EM);
             // await fetchListUser();
-            // props.setCurrentPage(1);
             await props.fetchListUserWithPaginate(props.currentPage);
         }
 
@@ -157,7 +156,7 @@ const ModalUpdateUser = (props) => {
                                 <FcPlus />
                                 Upload File Image
                             </label>
-                            <input type="file" hidden id="label-upload" onChange={handleUploadImage} />
+                            <input type="file" id="label-upload" onChange={handleUploadImage} />
                         </div>
                         <div className="col-md-12 img-priview">
                             {previewImage ? <img src={previewImage} alt="anh" /> : <span>No Preview Image</span>}

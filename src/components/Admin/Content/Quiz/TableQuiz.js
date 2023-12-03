@@ -2,24 +2,26 @@ import { useEffect, useState } from 'react';
 import { getAllQuizForAdmin } from '../../../../services/apiService';
 
 const TableQuiz = (props) => {
-    const [listQuiz, setListQuiz] = useState([]);
+    const { handleUpdateQuiz, listQuiz, handleDeleteQuiz } = props;
 
-    useEffect(() => {
-        fetchQuiz();
-    }, []);
+    // const [listQuiz, setListQuiz] = useState([]);
 
-    const fetchQuiz = async () => {
-        let res = await getAllQuizForAdmin();
-        console.log('res:', res);
-        if (res && res.EC === 0) {
-            setListQuiz(res.DT);
-        }
-    };
+    // useEffect(() => {
+    //     fetchQuiz();
+    // }, []);
+
+    // const fetchQuiz = async () => {
+    //     let res = await getAllQuizForAdmin();
+    //     console.log('res:', res);
+    //     if (res && res.EC === 0) {
+    //         setListQuiz(res.DT);
+    //     }
+    // };
 
     return (
         <>
             <div>List Quizes:</div>
-            <table className="table table-hover table-bordered mt-2">
+            <table className="table table-hover table-bordered mt-2 my-2">
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
@@ -39,8 +41,12 @@ const TableQuiz = (props) => {
                                     <td>{item.description}</td>
                                     <td>{item.difficulty}</td>
                                     <td style={{ display: 'flex', gap: '15px' }}>
-                                        <button className="btn btn-warning">Edit</button>
-                                        <button className="btn btn-danger">Delete</button>
+                                        <button className="btn btn-warning" onClick={() => handleUpdateQuiz(item)}>
+                                            Update
+                                        </button>
+                                        <button className="btn btn-danger" onClick={() => handleDeleteQuiz(item)}>
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             );

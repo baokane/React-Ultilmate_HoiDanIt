@@ -1,11 +1,13 @@
 import './ManageQuiz.scss';
 import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
-import { useState } from 'react';
-import { postCreateNewQuiz } from '../../../../services/apiService';
+import { useState, useEffect } from 'react';
+import { postCreateNewQuiz, getAllQuizForAdmin } from '../../../../services/apiService';
 import { Table } from 'react-bootstrap';
 import TableQuiz from './TableQuiz';
 import Accordion from 'react-bootstrap/Accordion';
+import ModalUpdateQuiz from './ModalUpdateQuiz';
+import ModalDeleteQuiz from './ModalDeleteQuiz';
 
 const options = [
     { value: 'EASY', label: 'EASY' },
@@ -19,6 +21,30 @@ const ManageQuiz = (props) => {
     const [type, setType] = useState('');
     const [image, setImage] = useState(null);
     const [previewImage, setPreviewImage] = useState('');
+
+    const [showModalUpdateQuiz, setShowModalUpdateQuiz] = useState(false);
+    const [showModalDeleteQuiz, setShowModalDeleteQuiz] = useState(false);
+
+    const [dataUpdateQuiz, setDataUpdateQuiz] = useState({});
+    const [dataDeleteQuiz, setDataDeleteQuiz] = useState({});
+
+    const [listQuiz, setListQuiz] = useState([]);
+
+    useEffect(() => {
+        fetchQuiz();
+    }, []);
+
+    const fetchQuiz = async () => {
+        let res = await getAllQuizForAdmin();
+        console.log('res:', res);
+        if (res && res.EC === 0) {
+            setListQuiz(res.DT);
+        }
+    };
+
+    const resetDataModalUpdate = () => {
+        setDataUpdateQuiz('');
+    };
 
     const handleChangeFile = (e) => {
         if (e.target && e.target.files && e.target.files[0]) {
@@ -34,7 +60,7 @@ const ManageQuiz = (props) => {
         }
 
         let res = await postCreateNewQuiz(description, name, type?.value, image);
-        console.log('res:', res);
+        // console.log('res:', res);
         if (res && res.EC === 0) {
             toast.success(res.EM);
             setName('');
@@ -44,6 +70,17 @@ const ManageQuiz = (props) => {
         } else {
             toast.error(res.EM);
         }
+    };
+
+    const handleUpdateQuiz = (item) => {
+        setShowModalUpdateQuiz(true);
+        setDataUpdateQuiz(item);
+    };
+
+    const handleDeleteQuiz = (item) => {
+        console.log('item:', item);
+        setShowModalDeleteQuiz(true);
+        setDataDeleteQuiz(item);
     };
 
     return (
@@ -112,9 +149,31 @@ const ManageQuiz = (props) => {
             </Accordion>
 
             <div className="list-detail">
-                <TableQuiz />
+                <TableQuiz
+                    handleUpdateQuiz={handleUpdateQuiz}
+                    listQuiz={listQuiz}
+                    handleDeleteQuiz={handleDeleteQuiz}
+                />
             </div>
-            <div></div>
+            <div>
+                <ModalUpdateQuiz
+                    show={showModalUpdateQuiz}
+                    setShow={setShowModalUpdateQuiz}
+                    dataUpdateQuiz={dataUpdateQuiz}
+                    postCreateNewQuiz={postCreateNewQuiz}
+                    getAllQuizForAdmin={getAllQuizForAdmin}
+                    fetchQuiz={fetchQuiz}
+                    resetDataModalUpdate={resetDataModalUpdate}
+                />
+            </div>
+            <div>
+                <ModalDeleteQuiz
+                    setShow={setShowModalDeleteQuiz}
+                    show={showModalDeleteQuiz}
+                    dataDeleteQuiz={dataDeleteQuiz}
+                    fetchQuiz={fetchQuiz}
+                />
+            </div>
         </div>
     );
 };

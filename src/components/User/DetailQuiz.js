@@ -128,7 +128,7 @@ const DetailQuiz = (props) => {
         //         }
         //     ]
         // }
-        console.log('>>>data quiz: ', dataQuiz);
+        // console.log('>>>data quiz: ', dataQuiz);
         let payLoad = {
             quizId: +quizId,
             answers: [],
