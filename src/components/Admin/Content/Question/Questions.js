@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { BsPatchPlusFill } from 'react-icons/bs';
 import { BsFillPatchMinusFill } from 'react-icons/bs';
@@ -6,20 +6,26 @@ import { FaMinus } from 'react-icons/fa';
 import { FaPlus } from 'react-icons/fa';
 import { RiImageAddFill } from 'react-icons/ri';
 import { v4 as uuidv4 } from 'uuid';
+import {
+    getAllQuizForAdmin,
+    postCreteNewQuestionForQuiz,
+    postCreteNewAnswerForQuestion,
+} from '../../../../services/apiService';
 import _ from 'lodash';
 import './Questions.scss';
 import Lightbox from 'react-awesome-lightbox';
+import { toast } from 'react-toastify';
 
 const Questions = (props) => {
-    const options = [
-        { value: 'chocolate', label: 'Chocolate' },
-        { value: 'strawberry', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' },
-    ];
+    // const options = [
+    //     { value: 'chocolate', label: 'Chocolate' },
+    //     { value: 'strawberry', label: 'Strawberry' },
+    //     { value: 'vanilla', label: 'Vanilla' },
+    // ];
 
     const [selectedQuiz, setSelectedQuiz] = useState({});
 
-    const [questions, setQuestions] = useState([
+    const initQuestions = [
         {
             id: uuidv4(),
             description: '',
@@ -33,7 +39,9 @@ const Questions = (props) => {
                 },
             ],
         },
-    ]);
+    ];
+
+    const [questions, setQuestions] = useState(initQuestions);
 
     const [isPreviewImage, setIsPreviewImage] = useState(false);
 
@@ -41,6 +49,28 @@ const Questions = (props) => {
         title: '',
         url: '',
     });
+
+    const [listQuiz, setListQuiz] = useState([]);
+
+    useEffect(() => {
+        fetchQuiz();
+    }, []);
+
+    const fetchQuiz = async () => {
+        let res = await getAllQuizForAdmin();
+        console.log('ress:', res);
+        if (res && res.EC === 0) {
+            let newQuiz = res.DT.map((item) => {
+                return {
+                    value: item.id,
+                    label: `${item.id} - ${item.description}`,
+                };
+            });
+            setListQuiz(newQuiz);
+        }
+    };
+
+    console.log('>>> listQuiz:', listQuiz);
 
     const handleAddRemoveQuestion = (type, id) => {
         console.log('type:', type, 'id:', id);
@@ -93,7 +123,7 @@ const Questions = (props) => {
             let index = questionsClone.findIndex((item) => item.id === questionId);
             questionsClone[index].answers = questionsClone[index].answers.filter((item) => item.id !== answerId);
             setQuestions(questionsClone);
-            console.log('question-clone:', questionsClone);
+            // console.log('question-clone:', questionsClone);
         }
     };
 
@@ -142,8 +172,78 @@ const Questions = (props) => {
         }
     };
 
-    const handleSubmitQuestionForQuiz = () => {
-        console.log('>>> questions:', questions);
+    const handleSubmitQuestionForQuiz = async () => {
+        console.log('>>> questions:', questions, selectedQuiz);
+
+        // submit question
+        // await Promise.all(
+        //     questions.map(async (question) => {
+        //         const q = await postCreteNewQuestionForQuiz(
+        //             +selectedQuiz.value,
+        //             question.description,
+        //             question.imageFile,
+        //         );
+        //         console.log('q:', q);
+
+        //         // submit answer
+        //         await Promise.all(
+        //             question.answers.map(async (answer) => {
+        //                 await postCreteNewAnswerForQuestion(answer.description, answer.isCorrect, q.DT.id);
+        //             }),
+        //         );
+        //     }),
+        // );
+
+        // Todo
+        if (_.isEmpty(selectedQuiz)) {
+            toast.error('Please choose a Quiz');
+            return;
+        }
+
+        // Validate Answer
+        let isValidAnswer = true;
+        let indexQ = 0,
+            indexA = 0;
+        for (let i = 0; i < questions.length; i++) {
+            for (let j = 0; j < questions[i].answers.length; j++) {
+                if (!questions[i].answers[j].description) {
+                    isValidAnswer = false;
+                    indexA = j;
+                    break;
+                }
+            }
+            indexQ = i;
+            if (isValidAnswer === false) break;
+        }
+        if (isValidAnswer === false) {
+            toast.error(`Not empty Answer${indexA + 1} at Question${indexQ + 1}`);
+            return;
+        }
+
+        // Validate Question
+        let isValidQ = true;
+        let indexQ1 = 0;
+        for (let i = 0; i < questions.length; i++) {
+            if (!questions[i].description) {
+                isValidQ = false;
+                indexQ1 = i;
+                break;
+            }
+        }
+        if (isValidQ === false) {
+            toast.error(`Not empty description for Question ${indexQ1 + 1}`);
+        }
+
+        // submit question
+        for (const question of questions) {
+            const q = await postCreteNewQuestionForQuiz(+selectedQuiz.value, question.description, question.imageFile);
+            // submit answer
+            for (const answer of question.answers) {
+                await postCreteNewAnswerForQuestion(answer.description, answer.isCorrect, q.DT.id);
+            }
+        }
+        toast.success('Create question and answer success');
+        setQuestions(initQuestions);
     };
 
     const handlePreviewImage = (questionId) => {
@@ -168,7 +268,7 @@ const Questions = (props) => {
                 <label className="mb-2">
                     <b>Selec Quiz:</b>
                 </label>
-                <Select defaultValue={selectedQuiz} onChange={setSelectedQuiz} options={options} />
+                <Select defaultValue={selectedQuiz} onChange={setSelectedQuiz} options={listQuiz} />
                 {/* </div> */}
                 <div className="mt-3 mb-2">
                     <b>Add question:</b>
