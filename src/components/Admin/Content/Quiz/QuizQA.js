@@ -303,7 +303,7 @@ const QuizQA = (props) => {
             questions: questionsClone,
         });
 
-        console.log('>>> questionsClone:', questionsClone);
+        console.log('>>> res cuoi:', res);
 
         if (res && res.EC === 0) {
             toast.success(res.EM);

@@ -5,6 +5,7 @@ import _ from 'lodash';
 import './DetailQuiz.scss';
 import Question from './Question';
 import ModalResult from './ModalResult';
+import RightContent from './Content/RightContent';
 
 const DetailQuiz = (props) => {
     const params = useParams();
@@ -74,7 +75,7 @@ const DetailQuiz = (props) => {
     // i0 c1 ->i1 c2 ->i2 c3 loại
 
     const handleCheckbox = (answerId, questionId) => {
-        // console.log('qID:', questionId, 'aID:', answerId);
+        console.log('qID:', questionId, 'aID:', answerId);
 
         let dataQuizClone = _.cloneDeep(dataQuiz);
         let question = dataQuizClone.find((item) => {
@@ -87,9 +88,10 @@ const DetailQuiz = (props) => {
                 }
                 return item;
             });
+            console.log('b:', b);
             // question.answers = b; // đang thử ko dùng
         }
-        console.log('dataQuizClone: ', dataQuizClone);
+        // console.log('dataQuizClone:: ', dataQuizClone);
         setDataQuiz(dataQuizClone);
 
         // let index = dataQuizClone.findIndex((item) => +item.questionId === +questionId);
@@ -154,6 +156,7 @@ const DetailQuiz = (props) => {
                 });
             });
 
+            console.log('payload:', payLoad);
             payLoad.answers = answers;
             // console.log('final payload:', payLoad);
             // submit Api
@@ -170,7 +173,7 @@ const DetailQuiz = (props) => {
         }
     };
 
-    console.log('data quiz', dataQuiz);
+    console.log('data quiz:', dataQuiz);
     return (
         <div className="detail-quiz-container">
             <div className="left-content">
@@ -200,7 +203,9 @@ const DetailQuiz = (props) => {
                     </button>
                 </div>
             </div>
-            <div className="right-content">Count Down</div>
+            <div className="right-content">
+                <RightContent dataQuiz={dataQuiz} handleFinishQuiz={handleFinishQuiz} />
+            </div>
             <ModalResult show={isShowModalResult} setShow={setIsShowModalResult} dataModalResult={dataModalResult} />
         </div>
     );

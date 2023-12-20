@@ -41,9 +41,10 @@ const AssignQuiz = (props) => {
         }
     };
 
+    console.log('setListQuiz:', listQuiz, 'setListUser:', listUser);
+
     const handleAssign = async () => {
         let res = await postAssignQuiz(selectedQuiz.value, selectedUser.value);
-        console.log('ress: ', res);
         if (res && res.EC === 0) {
             toast.success(res.EM);
         } else {
